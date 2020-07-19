@@ -8,7 +8,7 @@ services:
             - 33400
         network_mode: "host"
         volumes: 
-            - /mnt/gdrive/anime:/anime
+            - /mnt/gdrive:/gdrive
         depends_on:
             - rclone-mount
     
