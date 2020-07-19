@@ -23,7 +23,7 @@ services:
             - 'apparmor:uconfined'
         volumes: 
             - '/var/run/docker.sock:/tmp/docker.sock:ro'
-            - '/home/lord/.config/rclone:/config'
+            - '/home/arch/.config/rclone:/config'
             - '/mnt/gdrive:/mnt/mediaefs:shared'
         logging:
             options:
