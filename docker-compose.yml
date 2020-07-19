@@ -8,7 +8,7 @@ services:
             - 33400
         network_mode: "host"
         volumes: 
-            - /mnt/gdrive:/gdrive
+            - '/mnt/gdrive:/gdrive:shared'
         depends_on:
             - rclone-mount
     
