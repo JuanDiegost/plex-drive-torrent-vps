@@ -2,13 +2,14 @@ version: "3"
 
 services:
     plex:
-        image: jaymoulin/plex
+        image: linuxserver/plex
         expose: 
             - 32400
             - 33400
         network_mode: "host"
         volumes: 
             - '/mnt/gdrive:/gdrive:shared'
+            - /home/arch/plex:/config
         depends_on:
             - rclone-mount
     
