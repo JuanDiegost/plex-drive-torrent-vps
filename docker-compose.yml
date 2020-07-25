@@ -76,7 +76,8 @@ services:
           - ./flexget:/config
           - ${STORAGE}/torrents:/downloads
           - ${MEDIA}:/storage
-          - '/mnt/gdrive':/sync
+          - /mnt/gdrive:/sync
+
         ports:
           - 3539:3539
           - 5050:5050
@@ -93,4 +94,3 @@ services:
             - rclone-mount
         links:
           - transmission
-          - rclone-mount
