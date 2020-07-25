@@ -1,0 +1,31 @@
+2020-07-25 16:10:31 VERBOSE  manager                       Creating new database /config/db-config.sqlite - DO NOT INTERRUPT ...
+2020-07-25 16:33:00 INFO     manager                       Test mode, creating a copy from database ...
+2020-07-25 16:33:00 INFO     manager                       Test database created
+2020-07-25 16:33:02 VERBOSE  task_queue                    There are 5 tasks to execute. Shutdown will commence when they have completed.
+2020-07-25 16:33:03 INFO     transmission  puya            Trying to connect to transmission...
+2020-07-25 16:33:03 INFO     transmission  puya            Successfully connected to transmission.
+2020-07-25 16:34:21 VERBOSE  task_queue                    There are 1 tasks to execute. Shutdown will commence when they have completed.
+2020-07-25 16:35:22 CRITICAL plugin        puya            Unable to download the RSS for task puya (https://nyaa.si/?page=rss&u=puyero): HTTPSConnectionPool(host='nyaa.si', port=443): Read timed out. (read timeout=60)
+2020-07-25 16:35:22 WARNING  task          puya            Aborting task (plugin: rss)
+2020-07-25 16:36:59 VERBOSE  task_queue                    There are 1 tasks to execute. Shutdown will commence when they have completed.
+2020-07-25 16:38:00 CRITICAL plugin        eztvrss         Unable to download the RSS for task eztvrss (https://eztv.ag/ezrss.xml): HTTPSConnectionPool(host='eztv.ag', port=443): Read timed out. (read timeout=60)
+2020-07-25 16:38:00 WARNING  task          eztvrss         Aborting task (plugin: rss)
+2020-07-25 16:39:58 VERBOSE  task_queue                    There are 1 tasks to execute. Shutdown will commence when they have completed.
+2020-07-25 16:40:58 CRITICAL plugin        eztvrss         Unable to download the RSS for task eztvrss (https://eztv.ag/ezrss.xml): HTTPSConnectionPool(host='eztv.ag', port=443): Read timed out. (read timeout=60)
+2020-07-25 16:40:58 WARNING  task          eztvrss         Aborting task (plugin: rss)
+2020-07-25 16:44:08 VERBOSE  task_queue                    There are 1 tasks to execute. Shutdown will commence when they have completed.
+2020-07-25 16:45:08 CRITICAL plugin        eztvrss         Unable to download the RSS for task eztvrss (https://eztv.ag/ezrss.xml): HTTPSConnectionPool(host='eztv.ag', port=443): Read timed out. (read timeout=60)
+2020-07-25 16:45:08 WARNING  task          eztvrss         Aborting task (plugin: rss)
+2020-07-25 16:48:30 VERBOSE  task_queue                    There are 1 tasks to execute. Shutdown will commence when they have completed.
+2020-07-25 16:49:30 CRITICAL plugin        eztvrss         Unable to download the RSS for task eztvrss (https://eztv.ag/ezrss.xml): HTTPSConnectionPool(host='eztv.ag', port=443): Read timed out. (read timeout=60)
+2020-07-25 16:49:30 WARNING  task          eztvrss         Aborting task (plugin: rss)
+2020-07-25 16:55:38 VERBOSE  task_queue                    There are 1 tasks to execute. Shutdown will commence when they have completed.
+2020-07-25 16:56:38 WARNING  urllib3.connectionpool eztvrss         Retrying (Retry(total=0, connect=None, read=None, redirect=0, status=None)) after connection broken by 'ReadTimeoutError("HTTPConnectionPool(host='eztv.ag', port=80): Read timed out. (read timeout=60)")': /ezrss.xml
+2020-07-25 16:57:39 CRITICAL plugin        eztvrss         Unable to download the RSS for task eztvrss (http://eztv.ag/ezrss.xml): HTTPConnectionPool(host='eztv.ag', port=80): Max retries exceeded with url: /ezrss.xml (Caused by ReadTimeoutError("HTTPConnectionPool(host='eztv.ag', port=80): Read timed out. (read timeout=60)"))
+2020-07-25 16:57:39 WARNING  task          eztvrss         Aborting task (plugin: rss)
+2020-07-25 16:59:01 VERBOSE  task_queue                    There are 1 tasks to execute. Shutdown will commence when they have completed.
+2020-07-25 17:00:01 CRITICAL plugin        eztvrss         Unable to download the RSS for task eztvrss (https://eztv.ag/ezrss.xml): HTTPSConnectionPool(host='eztv.ag', port=443): Read timed out. (read timeout=60)
+2020-07-25 17:00:01 WARNING  task          eztvrss         Aborting task (plugin: rss)
+2020-07-25 17:06:29 VERBOSE  task_queue                    There are 1 tasks to execute. Shutdown will commence when they have completed.
+2020-07-25 17:07:29 CRITICAL plugin        eztvrss         Unable to download the RSS for task eztvrss (https://eztv.ag/ezrss.xml): HTTPSConnectionPool(host='eztv.ag', port=443): Read timed out. (read timeout=60)
+2020-07-25 17:07:29 WARNING  task          eztvrss         Aborting task (plugin: rss)
