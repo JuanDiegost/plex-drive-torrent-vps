@@ -39,7 +39,6 @@ services:
         volumes: 
             - '/var/run/docker.sock:/tmp/docker.sock:ro'
             - '/home/arch/.config/rclone:/config'
-            - ${STORAGE}/torrents:/sync
             - '/mnt/gdrive:/mnt/mediaefs:shared'
         logging:
             options:
@@ -77,6 +76,7 @@ services:
           - ./flexget:/config
           - ${STORAGE}/torrents:/downloads
           - ${MEDIA}:/storage
+          - '/mnt/gdrive':/sync
         ports:
           - 3539:3539
           - 5050:5050
