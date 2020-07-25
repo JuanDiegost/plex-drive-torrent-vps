@@ -89,5 +89,7 @@ services:
         restart: unless-stopped
         depends_on:
             - transmission
+            - rclone-mount
         links:
           - transmission
+          - rclone-mount
