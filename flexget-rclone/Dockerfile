@@ -1,43 +1,36 @@
 FROM lsiobase/alpine:3.11
 
-ARG RCLONE_VERSION=current
-ARG ARCH=amd64
-ENV SYNC_SRC=
-ENV SYNC_DEST=
-ENV SYNC_OPTS=-v
-ENV SYNC_OPTS_EVAL=
-ENV SYNC_ONCE=
-ENV RCLONE_CMD=sync
-ENV RCLONE_DIR_CMD=ls
-ENV RCLONE_DIR_CMD_DEPTH=-1
-ENV RCLONE_DIR_CHECK_SKIP=
-ENV RCLONE_OPTS="--config /configrclone/rclone.conf"
-ENV OUTPUT_LOG=
-ENV ROTATE_LOG=
-ENV CRON=
-ENV CRON_ABORT=
-ENV FORCE_SYNC=
-ENV CHECK_URL=
-ENV FAIL_URL=
-ENV TZ=
-ENV UID=
-ENV GID=
+ENV RCLONE_VER=1.49.5 \
+    BUILD_DATE=20191024T205553 \
+    ARCH=amd64 \
+    SUBCMD="" \
+    CONFIG="--config /config2/rclone.conf" \
+    PARAMS=""
 
-RUN apk --no-cache add ca-certificates fuse wget dcron tzdata
+LABEL build_version="Version:- ${RCLONE_VER} Build-date:- ${BUILD_DATE}"
+LABEL maintainer="Lucas Halbert <lhalbert@lhalbert.xyz>"
 
-RUN URL=http://downloads.rclone.org/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-linux-${ARCH}.zip ; \
-  URL=${URL/\/current/} ; \
-  cd /tmp \
-  && wget -q $URL \
-  && unzip /tmp/rclone-${RCLONE_VERSION}-linux-${ARCH}.zip \
-  && mv /tmp/rclone-*-linux-${ARCH}/rclone /usr/bin \
-  && rm -r /tmp/rclone*
 
-COPY entrypoint.sh /
-COPY sync.sh /
-COPY sync-abort.sh /
+RUN apk add --no-cache --update ca-certificates fuse fuse-dev unzip curl mdocml-apropos curl-doc && \
+    curl -O https://downloads.rclone.org/v${RCLONE_VER}/rclone-v${RCLONE_VER}-linux-${ARCH}.zip && \
+    unzip rclone-v${RCLONE_VER}-linux-${ARCH}.zip && \
+    cd rclone-*-linux-${ARCH} && \
+    cp rclone /usr/bin/ && \
+    chown root:root /usr/bin/rclone && \
+    chmod 755 /usr/bin/rclone && \
+    mkdir -p /usr/share/man/man1 && \
+    cp rclone.1 /usr/share/man/man1/ && \
+    makewhatis /usr/share/man && \
+    apk del --purge unzip curl && \
+    cd ../ && \
+    rm -f rclone-v${RCLONE_VER}-linux-${ARCH}.zip && \
+    rm -r rclone-*-linux-${ARCH}
 
-RUN chmod +x /entrypoint.sh
+
+COPY docker-entrypoint.sh /usr/bin/
+
+
+RUN chmod +x /usr/bin/docker-entrypoint.sh
 
 RUN \
 	echo "**** install frolvlad/alpine-python3 ****" && \
@@ -102,6 +95,4 @@ WORKDIR /config
 EXPOSE 3539 3539/tcp
 
 
-VOLUME ["/configrclone"]
-VOLUME ["/logs"]
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
