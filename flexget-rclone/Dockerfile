@@ -3,7 +3,7 @@ ENV RCLONE_VER=1.49.5 \
     BUILD_DATE=20191024T205553 \
     ARCH=amd64 \
     SUBCMD="" \
-    CONFIG="--config /config/rclone.conf" \
+    CONFIG="--config /configrclone/rclone.conf" \
     PARAMS=""
 
 LABEL build_version="Version:- ${RCLONE_VER} Build-date:- ${BUILD_DATE}"

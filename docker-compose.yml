@@ -65,7 +65,7 @@ services:
           - ${MEDIA}:/storage
           - /mnt/gdrive:/sync
           - '/var/run/docker.sock:/tmp/docker.sock:ro'
-          - '/home/arch/.config/rclone2:/config'
+          - '/home/arch/.config/rclone:/configrclone'
 
         ports:
           - 3539:3539
