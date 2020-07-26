@@ -10,10 +10,14 @@ templates:
       port: 9091
       username: "{{ secrets.transmission.username }}"
       password: "{{ secrets.transmission.password }}"
-      honourlimits: yes
-    verify_ssl_certificates: yes
   anime_watching:
     discover:
+      what:
+        - next_trakt_episodes:
+            username: juandiegost
+            account: juandiegost
+            context: watched
+            list: lista-series
       from:
         - argenteam:
             force_subtitles: yes
