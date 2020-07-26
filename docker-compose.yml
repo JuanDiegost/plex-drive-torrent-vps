@@ -63,7 +63,7 @@ services:
           - ./flexget:/config
           - ${STORAGE}/torrents:/downloads
           - ${MEDIA}:/storage
-          - /mnt/upload:/sync
+          - ${STORAGE}/upload:/sync
         ports:
           - 3539:3539
           - 5050:5050
