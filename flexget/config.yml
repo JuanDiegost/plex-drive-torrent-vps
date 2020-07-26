@@ -43,7 +43,7 @@ templates:
             path: "/downloads/complete/Anime/{{series_name}}"
             content_filename: "{{series_name}} - {{series_id | pad(2)}}"
   tv_watching:
-    rss: "{{ secrets.tv_watching.rss }}"
+    rss: https://nyaa.si/?page=rss&u=Erai-raws
     series:
       settings:
         all:
