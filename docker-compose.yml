@@ -57,7 +57,7 @@ services:
           - 51413:51413/udp
         restart: unless-stopped
 
-     flexget:
+    flexget:
         image: wiserain/flexget
         volumes:
           - ./flexget:/config
