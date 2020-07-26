@@ -1,33 +1,38 @@
 FROM wiserain/flexget
-ENV RCLONE_VER=1.49.5 \
-    BUILD_DATE=20191024T205553 \
-    ARCH=amd64 \
-    SUBCMD="" \
-    CONFIG="--config /configrclone/rclone.conf" \
-    PARAMS=""
 
-LABEL build_version="Version:- ${RCLONE_VER} Build-date:- ${BUILD_DATE}"
-LABEL maintainer="lord"
-MAINTAINER Lucas Halbert <lhalbert@lhalbert.xyz>
+ARG OVERLAY_VERSION="v1.22.1.0"
+ARG OVERLAY_ARCH="amd64"
 
+ENV DEBUG="false" \
+    GOPATH="/go" \
+    AccessFolder="/mnt" \
+    RemotePath="mediaefs:" \
+    MountPoint="/mnt/mediaefs" \
+    ConfigDir="/configrclone" \
+    ConfigName=".rclone.conf" \
+    MountCommands="--allow-other --allow-non-empty" \
+    UnmountCommands="-u -z"
 
-RUN apk add --no-cache --update ca-certificates fuse fuse-dev unzip curl mdocml-apropos curl-doc && \
-    curl -O https://downloads.rclone.org/v${RCLONE_VER}/rclone-v${RCLONE_VER}-linux-${ARCH}.zip && \
-    unzip rclone-v${RCLONE_VER}-linux-${ARCH}.zip && \
-    cd rclone-*-linux-${ARCH} && \
-    cp rclone /usr/bin/ && \
-    chown root:root /usr/bin/rclone && \
-    chmod 755 /usr/bin/rclone && \
-    mkdir -p /usr/share/man/man1 && \
-    cp rclone.1 /usr/share/man/man1/ && \
-    makewhatis /usr/share/man && \
-    apk del --purge unzip curl && \
-    cd ../ && \
-    rm -f rclone-v${RCLONE_VER}-linux-${ARCH}.zip && \
-    rm -r rclone-*-linux-${ARCH}
+## Alpine with Go Git
+RUN apk --no-cache upgrade \
+    && apk add --no-cache --update alpine-sdk ca-certificates go git fuse fuse-dev gnupg \
+    && echo "Installing S6 Overlay" \
+    && curl -o /tmp/s6-overlay.tar.gz -L \
+    "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" \
+    && curl -o /tmp/s6-overlay.tar.gz.sig -L \
+    "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz.sig" \
+    && curl https://keybase.io/justcontainers/key.asc | gpg --import \
+    && gpg --verify /tmp/s6-overlay.tar.gz.sig /tmp/s6-overlay.tar.gz \
+    && tar xfz /tmp/s6-overlay.tar.gz -C / \
+    && echo "Download and compile rclone" \
+    && go get -u -v github.com/rclone/rclone \
+    && cp /go/bin/rclone /usr/sbin/ \
+    && rm -rf /go || true \
+    && apk del alpine-sdk go git gnupg \
+    && rm -rf /tmp/* /var/cache/apk/* /var/lib/apk/lists/*
 
+COPY rootfs/ /
 
-COPY docker-entrypoint.sh /usr/bin/
+VOLUME ["/mnt"]
 
-
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["/init"]
