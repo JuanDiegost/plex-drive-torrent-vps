@@ -64,13 +64,12 @@ services:
           - ${STORAGE}/torrents:/downloads
           - ${MEDIA}:/storage
           - /mnt/gdrive:/sync
-          - '/var/run/docker.sock:/tmp/docker.sock:ro'
-          - '/home/arch/.config/rclone:/configrclone'
-
+          - '/home/arch/.config/rclone:/config2'
         ports:
           - 3539:3539
           - 5050:5050
           - 443:443
+          - 80:80
         expose:
           - 5050
           - 3539
