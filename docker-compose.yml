@@ -58,18 +58,16 @@ services:
         restart: unless-stopped
 
     flexget:
-        build: flexget-rclone
+        image: : wiserain/flexget
         volumes:
           - ./flexget:/config
           - ${STORAGE}/torrents:/downloads
           - ${MEDIA}:/storage
           - /mnt/gdrive:/sync
-          - '/home/arch/.config/rclone:/config2'
         ports:
           - 3539:3539
           - 5050:5050
           - 443:443
-          - 80:80
         expose:
           - 5050
           - 3539
