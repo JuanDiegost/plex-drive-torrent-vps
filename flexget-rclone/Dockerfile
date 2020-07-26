@@ -33,12 +33,6 @@ RUN apk --no-cache upgrade \
     && apk del alpine-sdk go git gnupg \
     && rm -rf /tmp/* /var/cache/apk/* /var/lib/apk/lists/*
 
-COPY rootfs/ /
-
-VOLUME ["/mnt"]
-
-ENTRYPOINT ["/init"]
-
 RUN \
 	echo "**** install frolvlad/alpine-python3 ****" && \
 	apk add --no-cache python3 && \
@@ -100,3 +94,9 @@ WORKDIR /config
 
 # expose port for flexget webui
 EXPOSE 3539 3539/tcp
+
+COPY rootfs/ /
+
+VOLUME ["/mnt"]
+
+ENTRYPOINT ["/init"]
