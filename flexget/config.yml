@@ -2,14 +2,13 @@ web_server:
   bind: 0.0.0.0
   port: 3539
   web_ui: yes
-secrets: secrets.yml
 templates:
   global:
     transmission:
-      host: "{{ secrets.transmission.host }}"
+      host: transmission
       port: 9091
-      username: "{{ secrets.transmission.username }}"
-      password: "{{ secrets.transmission.password }}"
+      username: admin
+      password: "123456"
   anime_watching:
     discover:
       what:
@@ -30,7 +29,6 @@ templates:
               - link
               - magneturi    
       interval: 15 minutes
-      ignore_estimations: yes
     series:
       settings:
         all:
@@ -66,58 +64,58 @@ tasks:
   showrss_tv:
     template: tv_watching
     include: tv-watching.yml
-sort_tv:
-  priority: 2
-  no_entries_ok: yes
-  parsing:
-    series: guessit
-  filesystem:
-    path: /downloads/complete
-    regexp: '.*\.(avi|mkv|mp4)$'
-    recursive: yes
-  accept_all: yes
-  thetvdb_lookup: yes
-  require_field: series_name
-  all_series:
-    parse_only: yes
-  exec:
-    auto_escape: yes
-    on_output:
-      for_entries: |
-        mkdir -p "/sync/Anime/{{ series_name }}/Season {{ series_season }}" && mv "{{ location }}"  "/sync/Anime/{{ series_name }}/Season {{ series_season }}/{{ series_name }} - {{ series_id }}{{ location | pathext }}"
-sort_movies:
-  priority: 2
-  no_entries_ok: yes
-  filesystem:
-    path: /downloads/complete
-    regexp: '.*\.(avi|mkv|mp4)$'
-    recursive: yes
-  accept_all: yes
-  require_field: movie_name
-  imdb_lookup: yes
-  exec:
-    auto_escape: yes
-    on_output:
-      for_entries: |
-        if mediainfo "{{ location }}" | grep EAC3; then
-          mkdir -p "/storage/pelis/{{ movie_name }} ({{ movie_year }})" && ffmpeg -hwaccel auto -y -i "{{ location }}" -map 0 -c:s copy -c:v copy -c:a ac3 -b:a 640k "/storage/pelis/{{ movie_name }} ({{ movie_year }})/{{ movie_name }} ({{ movie_year }}){{ location | pathext }}"
-        else
-          mkdir -p "/storage/pelis/{{ movie_name }} ({{ movie_year }})" && cp "{{ location }}" "/storage/pelis/{{ movie_name }} ({{ movie_year }})/{{ movie_name }} ({{ movie_year }}){{ location | pathext }}"
-        fi
-remove_stale_torrents:
-  from_transmission:
-    host: transmission
-    port: 9091
-    username: admin
-    password: "123456"
-  disable: [seen, seen_info_hash]
-  if:
-    - transmission_progress == 1: accept
-    - not transmission_seed_ratio_ok: reject
-    - not transmission_idle_limit_ok: reject
-  transmission:
-    host: transmission
-    port: 9091
-    username: admin
-    password: "123456"
-    action: purge
+  sort_tv:
+    priority: 2
+    no_entries_ok: yes
+    parsing:
+      series: guessit
+    filesystem:
+      path: /downloads/complete
+      regexp: '.*\.(avi|mkv|mp4)$'
+      recursive: yes
+    accept_all: yes
+    thetvdb_lookup: yes
+    require_field: series_name
+    all_series:
+      parse_only: yes
+    exec:
+      auto_escape: yes
+      on_output:
+        for_entries: |
+          mkdir -p "/sync/Anime/{{ series_name }}/Season {{ series_season }}" && mv "{{ location }}"  "/sync/Anime/{{ series_name }}/Season {{ series_season }}/{{ series_name }} - {{ series_id }}{{ location | pathext }}"
+  sort_movies:
+    priority: 2
+    no_entries_ok: yes
+    filesystem:
+      path: /downloads/complete
+      regexp: '.*\.(avi|mkv|mp4)$'
+      recursive: yes
+    accept_all: yes
+    require_field: movie_name
+    imdb_lookup: yes
+    exec:
+      auto_escape: yes
+      on_output:
+        for_entries: |
+          if mediainfo "{{ location }}" | grep EAC3; then
+            mkdir -p "/storage/pelis/{{ movie_name }} ({{ movie_year }})" && ffmpeg -hwaccel auto -y -i "{{ location }}" -map 0 -c:s copy -c:v copy -c:a ac3 -b:a 640k "/storage/pelis/{{ movie_name }} ({{ movie_year }})/{{ movie_name }} ({{ movie_year }}){{ location | pathext }}"
+          else
+            mkdir -p "/storage/pelis/{{ movie_name }} ({{ movie_year }})" && cp "{{ location }}" "/storage/pelis/{{ movie_name }} ({{ movie_year }})/{{ movie_name }} ({{ movie_year }}){{ location | pathext }}"
+          fi
+  remove_stale_torrents:
+    from_transmission:
+      host: transmission
+      port: 9091
+      username: admin
+      password: "123456"
+    disable: [seen, seen_info_hash]
+    if:
+      - transmission_progress == 1: accept
+      - not transmission_seed_ratio_ok: reject
+      - not transmission_idle_limit_ok: reject
+    transmission:
+      host: transmission
+      port: 9091
+      username: admin
+      password: "123456"
+      action: purge
