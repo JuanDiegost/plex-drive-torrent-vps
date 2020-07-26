@@ -102,6 +102,6 @@ WORKDIR /config
 EXPOSE 3539 3539/tcp
 
 
-VOLUME ["/config"]
+VOLUME ["/configrclone"]
 VOLUME ["/logs"]
 ENTRYPOINT ["/entrypoint.sh"]
