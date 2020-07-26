@@ -1,0 +1,229 @@
+web_server:
+  bind: 0.0.0.0
+  port: 3539
+  web_ui: yes
+
+schedules:
+  - tasks: 'sort_*'
+    interval:
+      minutes: 5
+  - tasks: 'discover-*'
+    interval:
+      hours: 1
+  - tasks: 'sync-*'
+    interval:
+      hours: 1 
+  - tasks: 'remove_stale_torrents'
+    interval:
+      hours: 8
+
+# Plantillas para que la configuración de series y pelis sea siempre la misma.
+
+templates:  
+  series:
+    configure_series:
+      from:
+        trakt_list:
+          username: juandiegost
+          account: juandiegost
+          strip_dates: yes
+          list: lista-series
+          type: shows
+      settings:
+          exact: yes
+          propers: 12 hours
+          quality: 720p+ hdtv+
+    priority: 2
+    seen: false
+    no_entries_ok: yes
+    accept_all: yes
+    #tmdb_lookup: yes  # can also use imdb_lookup or tmdb_lookup
+    trakt_lookup: yes
+
+  pelis:
+        trakt_list:
+          username: juandiegost
+          account: juandiegost
+          strip_dates: yes
+          list: lista-pelis
+          type: movies
+        no_entries_ok: yes
+        accept_all: yes
+        seen: local
+        tmdb_lookup: yes  # can also use imdb_lookup or tmdb_lookup
+        imdb_lookup: yes
+        priority: 10 # run after the movie queue fill task
+tasks:
+  # En las tareas sync-* se generan las listas para que flexget trabaje 
+  # y marca cual fue el último capitulo marcado como visto. Obteniendo el contenido desde trakt
+  sync-series:
+    seen: false
+    no_entries_ok: yes
+    trakt_lookup: yes
+    trakt_list:
+          username: juandiegost
+          account: juandiegost
+          strip_dates: yes
+          list: lista-series
+          type: shows
+    accept_all: yes
+    set_series_begin: yes
+    list_remove:
+      - trakt_list:
+          username: juandiegost
+          account: juandiegost
+          list: lista-series
+          type: shows
+    list_add:
+      - trakt_list:
+          username: juandiegost
+          account: juandiegost
+          list: lista-series
+          type: shows
+    next_trakt_episodes:
+        username: juandiegost
+        account: juandiegost
+        context: watched # esto depende de como cada uno usa trakt, puede ser collected también
+        list: lista-series
+
+# Esta tarea sincroniza la lista de pelis
+  sync-movies:
+    trakt_list:
+      username: juandiegost
+      account: juandiegost
+      list: lista-pelis
+    accept_all: yes
+    imdb_lookup: yes
+    list_add:
+      - movie_list: lista-pelis
+      
+# En las tareas discover-* buscamos el contenido de las listas previamente generadas.
+# Usando los templates previamente creados, pasamos la configuración de lo que queremos ver.
+  discover-series:
+    template: series
+    discover:
+      what:
+        - next_trakt_episodes:
+            username: juandiegost
+            account: juandiegost
+            context: watched
+            list: lista-series
+      from:
+        - argenteam:
+            force_subtitles: yes
+        - piratebay:
+            category: video
+            sort_by: leechers
+            url: https://piratebaymirror.eu
+        - search_rss:
+            url: https://nyaa.si/?page=rss&u=puyero 
+            all_entries: yes
+            ascii: yes
+            escape: yes
+            link:
+              - link
+              - magneturi
+    list_match:
+              from:
+                - trakt_list:
+                   username: juandiegost
+                   account: juandiegost
+                   list: lista-series
+                   type: shows
+    torrent_alive: 10 # Will reject results with less than 10 seeds
+    transmission:
+      host: transmission
+      port: 9091
+      username: admin
+      password: "123456"
+
+  discover-movies:
+    template: pelis
+    quality: 720p+ hdtv+ # Make sure no screeners or cams are downloaded
+    discover:
+      what:
+        - movie_list:
+            list_name: lista-pelis
+            strip_year: yes
+      from:
+        - argenteam:
+            force_subtitles: yes
+        - piratebay:
+            category: video
+            sort_by: leechers
+            url: https://piratebaymirror.eu
+        - search_rss:
+            url: https://eztv.ag/ezrss.xml
+            all_entries: no
+            ascii: yes
+            escape: yes
+            link:
+              - link
+              - magneturi
+      interval: 1 days
+    list_match:
+      from:
+        - movie_list: lista-pelis
+    torrent_alive: 10 # Will reject results with less than 10 seeds
+    transmission:
+      host: transmission
+      port: 9091
+      username: admin
+      password: "123456"
+  # Ordenamos las descargas
+  sort_tv:
+    priority: 2
+    no_entries_ok: yes
+    manipulate:
+      - title:
+          replace:
+            regexp: '(\[[a-z0-9A-Z!]*\])'
+            format: ''
+    parsing:
+      series: guessit
+    filesystem:
+      path: /downloads/complete
+      regexp: '.*\.(avi|mkv|mp4)$'
+      recursive: yes
+    thetvdb_lookup: yes
+    require_field: series_name
+    all_series:
+      parse_only: yes
+    exec:
+      auto_escape: yes
+      on_output:
+        for_entries: |
+          mkdir -p "/sync/Anime/{{ tvdb_series_name }}/Season {{ series_season }}" && mv "{{ location }}"  "/sync/Anime/{{ tvdb_series_name }}/Season {{ series_season }}/{{ tvdb_series_name }} - {{ series_id }}{{ location | pathext }}"
+  sort_movies:
+    priority: 2
+    no_entries_ok: yes
+    filesystem:
+      path: /downloads/complete
+      regexp: '.*\.(avi|mkv|mp4)$'
+      recursive: yes
+    accept_all: yes
+    require_field: movie_name
+    tmdb_lookup: yes
+    imdb_lookup: yes
+    exec:
+      auto_escape: yes
+      on_output:
+       for_entries: |
+        mkdir -p "/sync/Peliculas/{{ movie_name }} ({{ movie_year }})/{{ movie_name }} ({{ movie_year }}){{ location | pathext }}" && mv "{{ location }}" "/sync/Peliculas/{{ movie_name }} ({{ movie_year }})/{{ movie_name }} ({{ movie_year }}){{ location | pathext }}"
+  remove_stale_torrents:
+    from_transmission:
+      host: transmission
+      port: 9091
+      username: admin
+      password: "123456"
+    disable: [seen, seen_info_hash]
+    if:
+      - transmission_progress == 100: accept
+      - not transmission_seed_ratio_ok: reject
+      - not transmission_idle_limit_ok: reject
+    transmission:
+      host: transmission
+      port: 9091
+      username: admin
+      password: "123456"
+      action: purge

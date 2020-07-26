@@ -38,3 +38,45 @@ services:
             - 'MountCommands=--allow-other --allow-non-empty --buffer-size 256M'
             - 'ConfigName=rclone.conf'
     
+    transmission:
+        image: linuxserver/transmission
+        container_name: transmission
+        environment:
+          - PUID=1000
+          - PGID=1000
+          - TZ=America/Bogota
+          - TRANSMISSION_WEB_HOME=/combustion-release/ #optional
+          - USER=admin #optional
+          - PASS=123456 #optional
+        volumes:
+          - ./transmission:/config
+          - ${STORAGE}/torrents:/downloads
+        ports:
+          - 9091:9091
+          - 51413:51413
+          - 51413:51413/udp
+        restart: unless-stopped
+
+     flexget:
+        image: wiserain/flexget
+        volumes:
+          - ./flexget:/config
+          - ${STORAGE}/torrents:/downloads
+          - ${MEDIA}:/storage
+          - ${STORAGE}/upload:/sync
+        ports:
+          - 3539:3539
+          - 5050:5050
+          - 443:443
+        expose:
+          - 5050
+          - 3539
+        environment:
+          - TORRENT_PLUGIN=transmission
+          - FG_WEBUI_PASSWD=123456
+        restart: unless-stopped
+        depends_on:
+            - transmission
+            - rclone-mount
+        links:
+          - transmission
