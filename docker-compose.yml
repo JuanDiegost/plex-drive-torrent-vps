@@ -58,13 +58,15 @@ services:
         restart: unless-stopped
 
     flexget:
-        image: wiserain/flexget
+        build: flexget-rclone
         volumes:
           - ./flexget:/config
           - ${STORAGE}/torrents:/downloads
           - ${MEDIA}:/storage
           - /mnt/gdrive:/sync
-
+          - '/var/run/docker.sock:/tmp/docker.sock:ro'
+          - '/home/arch/.config/rclone:/config'
+          
         ports:
           - 3539:3539
           - 5050:5050
