@@ -18,7 +18,7 @@ templates:
         - argenteam:
             force_subtitles: yes
         - search_rss:
-          url: https://nyaa.si/?page=rss&u=Erai-raws 
+            url: https://nyaa.si/?page=rss&u=Erai-raws 
             all_entries: yes
             ascii: yes
             escape: yes
