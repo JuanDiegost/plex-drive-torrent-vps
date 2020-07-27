@@ -40,7 +40,7 @@ templates:
           id_regexp: '[ \._\-](\d+(?:\.\d+)?)[ \._\-v]'
           identified_by: sequence
           set:
-            path: "/downloads/complete/Anime/{{series_name}}"
+            path: "/downloads/Anime/{{series_name}}"
             content_filename: "{{series_name}} - {{series_id | pad(2)}}"
   tv_watching:
     rss: https://nyaa.si/?page=rss&u=Erai-raws
@@ -50,7 +50,7 @@ templates:
           set:
             main_file_only: yes
             rename_like_files: yes
-            path: "/downloads/complete/TV//{{series_name}}"
+            path: "/downloads/TV/{{series_name}}"
             content_filename: "{{series_name}} - {{series_id}}"
             skip_files:
               - "*.nfo"
