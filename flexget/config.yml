@@ -64,13 +64,13 @@ tasks:
   showrss_tv:
     template: tv_watching
     include: tv-watching.yml
-  sort_tv:
+  sort_anime:
     priority: 2
     no_entries_ok: yes
     parsing:
       series: guessit
     filesystem:
-      path: /downloads/complete
+      path: /downloads/complete/Anime
       regexp: '.*\.(avi|mkv|mp4)$'
       recursive: yes
     accept_all: yes
@@ -119,3 +119,16 @@ tasks:
       username: admin
       password: "123456"
       action: purge
+schedules:
+  - tasks: 'sort_*'
+    interval:
+      minutes: 5
+  - tasks: 'showrss_tv'
+    interval:
+      hours: 1
+  - tasks: 'nyaa_anime'
+    interval:
+      minutes: 15 
+  - tasks: 'remove_stale_torrents'
+    interval:
+      hours: 1
