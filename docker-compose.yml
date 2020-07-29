@@ -1,82 +1,96 @@
 version: "3"
 
 services:
-
-    plex:
-        image: linuxserver/plex
-        expose: 
-            - 32400
-            - 33400
-        network_mode: "host"
-        volumes: 
-            - '/mnt/gdrive:/gdrive:shared'
-            - /home/arch/plex:/config
-        depends_on:
-            - rclone-mount
-    
-    rclone-mount:
-        image: pablokbs/rclone-mount
-        restart: unless-stopped
-        ports:
-            - '80:80'
-        cap_add: 
-            - SYS_ADMIN
-        security_opt: 
-            - 'apparmor:uconfined'
-        volumes: 
-            - '/var/run/docker.sock:/tmp/docker.sock:ro'
-            - '/home/arch/.config/rclone:/config'
-            - '/mnt/gdrive:/mnt/mediaefs:shared'
-        logging:
-            options:
-                max-size: 1g
-        container_name: rclone-mount
-        devices: 
-            - /dev/fuse
-        environment: 
-            - 'RemotePath=team:'
-            - 'MountCommands=--allow-other --allow-non-empty --buffer-size 256M'
-            - 'ConfigName=rclone.conf'
-    
-    transmission:
-        image: linuxserver/transmission
-        container_name: transmission
-        environment:
-          - PUID=1000
-          - PGID=1000
-          - TZ=America/Bogota
-          - TRANSMISSION_WEB_HOME=/combustion-release/ #optional
-          - USER=admin #optional
-          - PASS=123456 #optional
-        volumes:
-          - ./transmission:/config
-          - ${STORAGE}/torrents:/downloads
-        ports:
-          - 9091:9091
-          - 51413:51413
-          - 51413:51413/udp
-        restart: unless-stopped
-
-    flexget:
-        image: wiserain/flexget
-        volumes:
-          - ./flexget:/config
-          - ${STORAGE}/torrents:/downloads
-          - ${MEDIA}:/storage
-          - ${STORAGE}/upload:/sync
-        ports:
-          - 3539:3539
-          - 5050:5050
-          - 443:443
-        expose:
-          - 5050
-          - 3539
-        environment:
-          - TORRENT_PLUGIN=transmission
-          - FG_WEBUI_PASSWD=123456
-        restart: unless-stopped
-        depends_on:
-            - transmission
-            - rclone-mount
-        links:
+  plex:
+      image: linuxserver/plex
+      expose: 
+          - 32400
+          - 33400
+      network_mode: "host"
+      volumes: 
+          - '/mnt/gdrive:/gdrive:shared'
+          - /home/arch/plex:/config
+      depends_on:
+          - rclone-mount
+  
+  rclone-mount:
+      image: pablokbs/rclone-mount
+      restart: unless-stopped
+      ports:
+          - '80:80'
+      cap_add: 
+          - SYS_ADMIN
+      security_opt: 
+          - 'apparmor:uconfined'
+      volumes: 
+          - '/var/run/docker.sock:/tmp/docker.sock:ro'
+          - '/home/arch/.config/rclone:/config'
+          - '/mnt/gdrive:/mnt/mediaefs:shared'
+      logging:
+          options:
+              max-size: 1g
+      container_name: rclone-mount
+      devices: 
+          - /dev/fuse
+      environment: 
+          - 'RemotePath=team:'
+          - 'MountCommands=--allow-other --allow-non-empty --buffer-size 256M'
+          - 'ConfigName=rclone.conf'
+  
+  transmission:
+      image: linuxserver/transmission
+      container_name: transmission
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=America/Bogota
+        - TRANSMISSION_WEB_HOME=/combustion-release/ #optional
+        - USER=admin #optional
+        - PASS=123456 #optional
+      volumes:
+        - ./transmission:/config
+        - ${STORAGE}/torrents:/downloads
+      ports:
+        - 9091:9091
+        - 51413:51413
+        - 51413:51413/udp
+      restart: unless-stopped
+  flexget:
+      image: wiserain/flexget
+      volumes:
+        - ./flexget:/config
+        - ${STORAGE}/torrents:/downloads
+        - ${MEDIA}:/storage
+        - ${STORAGE}/upload:/sync
+      ports:
+        - 3539:3539
+        - 5050:5050
+        - 443:443
+      expose:
+        - 5050
+        - 3539
+      environment:
+        - TORRENT_PLUGIN=transmission
+        - FG_WEBUI_PASSWD=123456
+      restart: unless-stopped
+      depends_on:
           - transmission
+          - rclone-mount
+      links:
+        - transmission
+    
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Bogota
+      - AUTO_UPDATE=true #optional
+      #- RUN_OPTS=run options here #optional
+    volumes:
+      - jacketConf:/config
+      - blackhole:/downloads
+    ports:
+      - 9117:9117
+    restart: unless-stopped
