@@ -9,7 +9,7 @@ services:
       network_mode: "host"
       volumes: 
           - '/mnt/gdrive:/gdrive:shared'
-          - /home/arch/plex:/config
+          - /home/centos/plex:/config
       depends_on:
           - rclone-mount
   
@@ -24,7 +24,7 @@ services:
           - 'apparmor:uconfined'
       volumes: 
           - '/var/run/docker.sock:/tmp/docker.sock:ro'
-          - '/home/ubuntu/.config/rclone:/config'
+          - '/home/centos/.config/rclone:/config'
           - '/mnt/gdrive:/mnt/mediaefs:shared'
       logging:
           options:
